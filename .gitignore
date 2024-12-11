@@ -1,0 +1,16 @@
+# Ignore log files
+logs/
+
+# Ignore Docker-related files
+es_data/
+
+# Maven target directory
+/target
+
+# Ignore Logstash pipeline
+logstash/pipeline/logstash.conf
+
+# Ignore Logstash certs
+logstash/config/certs
+.env
+logfiles.log

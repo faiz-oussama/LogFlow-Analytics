@@ -1,0 +1,116 @@
+/* General Styles */
+.root {
+    -fx-background-color: #f5f5f5;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Summary Cards */
+.summary-card {
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-padding: 15px;
+    -fx-spacing: 5px;
+    -fx-min-width: 200px;
+}
+
+/* Charts */
+.chart {
+    -fx-padding: 10px;
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.chart-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.axis-label {
+    -fx-font-size: 12px;
+}
+
+/* Pie Chart */
+.chart-pie-label {
+    -fx-font-size: 11px;
+}
+
+.chart-pie {
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+}
+
+/* Bar Chart */
+.chart-bar {
+    -fx-bar-fill: #4CAF50;
+}
+
+.default-color0.chart-bar { -fx-bar-fill: #2196F3; }
+.default-color1.chart-bar { -fx-bar-fill: #4CAF50; }
+.default-color2.chart-bar { -fx-bar-fill: #FFC107; }
+.default-color3.chart-bar { -fx-bar-fill: #F44336; }
+
+/* Line Chart */
+.chart-series-line {
+    -fx-stroke-width: 2px;
+}
+
+.default-color0.chart-series-line { -fx-stroke: #2196F3; }
+
+/* Table View */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+}
+
+/* Combo Box */
+.combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 5px;
+}
+
+/* Scroll Pane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Tab Pane */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #f8f9fa;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #e9ecef;
+    -fx-padding: 8px 15px;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: white;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.tab-pane .tab-content-area {
+    -fx-background-color: white;
+}

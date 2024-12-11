@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.example.ChatbotController" stylesheets="@style.css">
+    <top>
+        <VBox spacing="0" styleClass="top-container">
+            <HBox fx:id="navbar" alignment="CENTER_LEFT" styleClass="navbar">
+                <padding>
+                    <Insets top="15" right="25" bottom="15" left="25"/>
+                </padding>
+                <HBox fx:id="navItems" spacing="35" alignment="CENTER" styleClass="nav-items">
+                    <padding>
+                        <Insets left="45"/>
+                    </padding>
+                    <Label fx:id="dashboardLabel" text="Dashboard" styleClass="nav-item" />
+                    <Label fx:id="logsLabel" text="Logs" styleClass="nav-item" />
+                    <Label fx:id="filterLabel" text="Filter" styleClass="nav-item" />
+                    <Label fx:id="chatbotLabel" text="Chatbot" styleClass="nav-item, nav-item-active" />
+                </HBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER" spacing="20" styleClass="nav-controls">
+                    <HBox styleClass="search-container">
+                        <TextField fx:id="searchField" promptText="Search logs..." styleClass="search-field" />
+                    </HBox>
+                    <StackPane styleClass="theme-toggle-container">
+                        <ToggleButton fx:id="darkModeToggle" styleClass="theme-toggle" />
+                    </StackPane>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="10" styleClass="chatbot-container">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <!-- Chat History -->
+            <ScrollPane fx:id="chatScrollPane" fitToWidth="true" styleClass="chat-scroll-pane" VBox.vgrow="ALWAYS">
+                <VBox fx:id="chatHistory" spacing="10" style="-fx-padding: 10;" VBox.vgrow="ALWAYS">
+                    <HBox fx:id="messageContainer" HBox.hgrow="ALWAYS">
+                        <!-- Chat messages will be added here dynamically -->
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+            
+            <!-- Typing Indicator -->
+            <HBox fx:id="typingIndicator" alignment="CENTER_LEFT" spacing="5" style="-fx-padding: 10 15; -fx-background-color: #f8f9fa; -fx-background-radius: 20;">
+                <Label fx:id="typingLabel" text="AI Assistant is typing" style="-fx-text-fill: #666; -fx-font-size: 13px;"/>
+                <HBox fx:id="dotsContainer" spacing="4" alignment="CENTER" style="-fx-background-color: #e0e0e0; -fx-background-radius: 20; -fx-padding: 10;">
+                    <Circle fx:id="dot1" radius="5" fill="#666"/>
+                    <Circle fx:id="dot2" radius="5" fill="#666"/>
+                    <Circle fx:id="dot3" radius="5" fill="#666"/>
+                </HBox>
+            </HBox>
+            
+            <!-- Input Area -->
+            <HBox spacing="10" styleClass="chat-input-container">
+                <TextField fx:id="userInput" promptText="Ask a question about your logs..." 
+                          styleClass="chat-input" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="sendButton" text="Send" styleClass="chat-send-button" 
+                        onAction="#handleSendMessage"/>
+            </HBox>
+            
+            <!-- Suggested Questions -->
+            <VBox spacing="5" styleClass="suggested-questions">
+                <Label text="Suggested Questions:" styleClass="suggested-label"/>
+                <FlowPane fx:id="suggestedQuestionsPane" hgap="10" vgap="5"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

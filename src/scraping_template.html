@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraping Results</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Web Scraping Results</h1>
+            <div class="timestamp">Last Updated: <span id="timestamp"></span></div>
+        </header>
+
+        <main>
+            <div class="scraping-container">
+                <div class="control-panel">
+                    <button class="refresh-btn">Refresh Data</button>
+                    <div class="filter-section">
+                        <input type="text" placeholder="Filter results..." class="filter-input">
+                    </div>
+                </div>
+
+                <div class="results-container">
+                    <div class="result-card">
+                        <h3 class="result-title">Sample Result</h3>
+                        <div class="result-content">
+                            <p>This is where scraped content will appear.</p>
+                        </div>
+                        <div class="result-meta">
+                            <span class="source">Source: Example.com</span>
+                            <span class="timestamp">Time: 12:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button class="prev-btn">Previous</button>
+                    <span class="page-info">Page 1 of 1</span>
+                    <button class="next-btn">Next</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 Web Scraping Dashboard</p>
+        </footer>
+    </div>
+</body>
+</html>

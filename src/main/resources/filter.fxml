@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.FilterController" stylesheets="@style.css">
+    <top>
+        <VBox spacing="0" styleClass="top-container">
+            <HBox fx:id="navbar" alignment="CENTER_LEFT" styleClass="navbar">
+                <padding>
+                    <Insets top="15" right="25" bottom="15" left="25"/>
+                </padding>
+                <HBox fx:id="navItems" spacing="35" alignment="CENTER" styleClass="nav-items">
+                    <padding>
+                        <Insets left="45"/>
+                    </padding>
+                    <Label fx:id="dashboardLabel" text="Dashboard" styleClass="nav-item" />
+                    <Label fx:id="logsLabel" text="Logs" styleClass="nav-item" />
+                    <Label fx:id="filterLabel" text="Filter" styleClass="nav-item, nav-item-active" />
+                    <Label fx:id="chatbotLabel" text="Chatbot" styleClass="nav-item" />
+                </HBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER" spacing="20" styleClass="nav-controls">
+                    <HBox styleClass="search-container">
+                        <TextField fx:id="searchField" promptText="Search logs..." styleClass="search-field" />
+                    </HBox>
+                    <StackPane styleClass="theme-toggle-container">
+                        <ToggleButton fx:id="darkModeToggle" styleClass="theme-toggle" />
+                    </StackPane>
+                </HBox>
+            </HBox>
+            <VBox styleClass="header-section" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="35" right="25" bottom="25" left="25"/>
+                </padding>
+                <HBox alignment="CENTER_LEFT" spacing="25">
+                    <VBox spacing="8">
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Label text="Filtering and Searching" styleClass="title-label"/>
+                            <Label text="LIVE" styleClass="live-badge"/>
+                        </HBox>
+                        <Label text="Real-time monitoring of system logs and events" styleClass="subtitle-label"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="main-content-scroll">
+            <VBox spacing="20" styleClass="filter-container">
+                <padding>
+                    <Insets top="20" right="25" bottom="20" left="25"/>
+                </padding>
+                
+                <!-- Time Range Section -->
+                <VBox styleClass="filter-section">
+                    <Label text="Time Range" styleClass="section-header"/>
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="timePresetCombo" promptText="Select preset" styleClass="filter-combo">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Last 15 minutes"/>
+                                    <String fx:value="Last hour"/>
+                                    <String fx:value="Last 24 hours"/>
+                                    <String fx:value="Last 7 days"/>
+                                    <String fx:value="Custom range"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                        <DatePicker fx:id="startDate" promptText="Start date" styleClass="filter-date"/>
+                        <TextField fx:id="startTime" promptText="Start time" styleClass="filter-time"/>
+                        <Label text="to" styleClass="to-label"/>
+                        <DatePicker fx:id="endDate" promptText="End date" styleClass="filter-date"/>
+                        <TextField fx:id="endTime" promptText="End time" styleClass="filter-time"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Log Level Section -->
+                <VBox styleClass="filter-section">
+                    <Label text="Log Level" styleClass="section-header"/>
+                    <FlowPane hgap="10" vgap="10">
+                        <CheckBox fx:id="errorCheck" text="ERROR" styleClass="level-check, error-level"/>
+                        <CheckBox fx:id="warnCheck" text="WARN" styleClass="level-check, warn-level"/>
+                        <CheckBox fx:id="infoCheck" text="INFO" styleClass="level-check, info-level"/>
+                        <CheckBox fx:id="debugCheck" text="DEBUG" styleClass="level-check, debug-level"/>
+                        <CheckBox fx:id="traceCheck" text="TRACE" styleClass="level-check, trace-level"/>
+                    </FlowPane>
+                </VBox>
+
+                <!-- Source Section -->
+                <VBox styleClass="filter-section">
+                    <Label text="Source" styleClass="section-header"/>
+                    <HBox spacing="15">
+                        <ComboBox fx:id="sourceCombo" promptText="Select source" styleClass="filter-combo" HBox.hgrow="ALWAYS">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="All Sources"/>
+                                    <String fx:value="Application"/>
+                                    <String fx:value="System"/>
+                                    <String fx:value="Security"/>
+                                    <String fx:value="Network"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                        <ComboBox fx:id="componentCombo" promptText="Select component" styleClass="filter-combo" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Advanced Filters Section -->
+                <VBox styleClass="filter-section">
+                    <Label text="Advanced Filters" styleClass="section-header"/>
+                    <VBox fx:id="advancedFiltersContainer" spacing="10">
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="advanced-filter-row">
+                            <ComboBox fx:id="fieldCombo" promptText="Field" styleClass="filter-combo">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Message"/>
+                                        <String fx:value="User ID"/>
+                                        <String fx:value="IP Address"/>
+                                        <String fx:value="Session ID"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                            <ComboBox fx:id="operatorCombo" promptText="Operator" styleClass="filter-combo">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Contains"/>
+                                        <String fx:value="Equals"/>
+                                        <String fx:value="Starts with"/>
+                                        <String fx:value="Ends with"/>
+                                        <String fx:value="Regex"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                            <TextField fx:id="valueField" promptText="Value" styleClass="filter-value" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="addFilterBtn" text="+" styleClass="add-filter-btn"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Filter Actions -->
+                <HBox spacing="15" alignment="CENTER_RIGHT">
+                    <Button fx:id="resetBtn" text="Reset Filters" styleClass="reset-btn"/>
+                    <Button fx:id="applyBtn" text="Apply Filters" styleClass="apply-btn"/>
+                </HBox>
+
+                <!-- Filtered Logs Table -->
+                <VBox styleClass="filter-section">
+                    <Label text="Filtered Logs" styleClass="section-header"/>
+                    <TableView fx:id="filteredLogsTable" VBox.vgrow="ALWAYS" styleClass="logs-table1">
+                        <columns>
+                            <TableColumn fx:id="columnIP" text="IP Address" prefWidth="160" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                            <TableColumn fx:id="columnTimestamp" text="Timestamp" prefWidth="210" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                            <TableColumn fx:id="columnRequestType" text="Request Type" prefWidth="140" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                            <TableColumn fx:id="columnEndpoint" text="Endpoint" prefWidth="200" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                            <TableColumn fx:id="columnStatusCode" text="Status Code" prefWidth="140" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                            <TableColumn fx:id="columnResponseTime" text="Response Time" prefWidth="140" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                            <TableColumn fx:id="columnLogLevel" text="Log Level" prefWidth="120" styleClass="table-column" style="-fx-text-fill: rgb(0, 0, 0);"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <Button fx:id="exportCsvBtn" text="Export to CSV" styleClass="export-button" />
+                </HBox>
+            </VBox>
+            
+        </ScrollPane>
+    </center>
+</BorderPane>
