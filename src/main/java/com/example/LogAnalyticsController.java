@@ -8,6 +8,10 @@ import javafx.collections.ObservableList;
 import java.util.*;
 import java.time.format.DateTimeFormatter;
 import javafx.application.Platform;
+import javafx.scene.layout.*;
+import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.GaugeBuilder;
+import eu.hansolo.medusa.Section;
 
 public class LogAnalyticsController {
     @FXML private PieChart logLevelChart;
@@ -29,9 +33,10 @@ public class LogAnalyticsController {
     @FXML private Label filterLabel;
     @FXML private Label chatbotLabel;
     @FXML private BubbleChart<Number, Number> responseSizeChart;
-    @FXML private StackedAreaChart<String, Number> actionDistributionChart;
+    @FXML private StackedBarChart<String, Number> actionDistributionChart;
     @FXML private GridPane methodStatusHeatmap;
-    @FXML private PolarChart userAgentChart;
+    @FXML private Pane polarChartContainer;
+    private Gauge polarGauge;
 
     private Map<String, Integer> logLevelCounts = new HashMap<>();
     private Map<String, Integer> httpMethodCounts = new HashMap<>();
@@ -106,7 +111,7 @@ public class LogAnalyticsController {
         setupResponseSizeBubbleChart();
         setupActionDistributionChart();
         setupMethodStatusHeatmap();
-        setupUserAgentRadarChart();
+        setupPolarChart();
     }
 
     public void processNewLog(LogEntry logEntry) {
@@ -164,7 +169,7 @@ public class LogAnalyticsController {
         setupResponseSizeBubbleChart();
         setupActionDistributionChart();
         setupMethodStatusHeatmap();
-        setupUserAgentRadarChart();
+        setupPolarChart();
     }
 
     private void updateLogLevelChart() {
@@ -230,170 +235,194 @@ public class LogAnalyticsController {
     }
 
     private void refreshCharts() {
-        // Implement time-based filtering based on selected time range
-        String selectedRange = timeRangeComboBox.getValue();
-        // Reset counters and recalculate based on time range
-        // This would filter logs based on the selected time range
+        // Clear existing data
+        logLevelCounts.clear();
+        httpMethodCounts.clear();
+        statusCodeCounts.clear();
+        endpointStats.clear();
+        
+        // Get current time
+        long currentTime = System.currentTimeMillis();
+        long filterTime;
+        
+        // Calculate filter time based on selected range
+        switch (timeRangeComboBox.getValue()) {
+            case "Last 15 minutes":
+                filterTime = currentTime - (15 * 60 * 1000);
+                break;
+            case "Last hour":
+                filterTime = currentTime - (60 * 60 * 1000);
+                break;
+            case "Last 24 hours":
+                filterTime = currentTime - (24 * 60 * 60 * 1000);
+                break;
+            case "Last 7 days":
+                filterTime = currentTime - (7 * 24 * 60 * 60 * 1000);
+                break;
+            default:
+                filterTime = currentTime - (60 * 60 * 1000); // Default to last hour
+        }
+
+        // Filter and process logs
+        List<LogEntry> filteredLogs = recentLogs.stream()
+            .filter(log -> {
+                try {
+                    long logTime = Long.parseLong(log.getTimestamp());
+                    return logTime >= filterTime;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            })
+            .collect(java.util.stream.Collectors.toList());
+
+        // Process filtered logs
+        filteredLogs.forEach(this::processNewLog);
+        
+        // Update all charts
+        updateCharts();
+        updateSummaryLabels();
     }
 
     private void setupResponseSizeBubbleChart() {
-        NumberAxis xAxis = new NumberAxis();
-        NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Response Size (KB)");
-        yAxis.setLabel("Status Code");
-        
-        responseSizeChart.setTitle("Response Size vs Status Code Distribution");
-        responseSizeChart.getStyleClass().add("modern-bubble-chart");
-        
-        ObservableList<BubbleChart.Series<Number, Number>> bubbleData = FXCollections.observableArrayList();
-        Map<String, List<Double>> responseData = new HashMap<>();
-        
-        for (LogEntry log : recentLogs) {
-            double responseSize = Double.parseDouble(log.getResponseSize()) / 1024.0; // Convert to KB
-            int statusCode = Integer.parseInt(log.getStatusCode());
-            responseData.computeIfAbsent(log.getStatusCode(), k -> new ArrayList<>()).add(responseSize);
-        }
-        
-        for (Map.Entry<String, List<Double>> entry : responseData.entrySet()) {
-            BubbleChart.Series<Number, Number> series = new BubbleChart.Series<>();
-            series.setName("Status " + entry.getKey());
-            
-            double avgSize = entry.getValue().stream().mapToDouble(Double::doubleValue).average().orElse(0);
-            double frequency = entry.getValue().size();
-            
-            series.getData().add(new BubbleChart.Data<>(avgSize, Integer.parseInt(entry.getKey()), frequency / 5));
-            bubbleData.add(series);
-        }
-        
-        responseSizeChart.setData(bubbleData);
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        recentLogs.forEach(log -> {
+            try {
+                double responseSize = Double.parseDouble(log.getResponseSize()) / 1024.0; // Convert to KB
+                series.getData().add(new XYChart.Data<>(
+                    responseSize,
+                    (double) log.getStatusCode(),
+                    Math.min(responseSize * 2, 20) // Bubble size proportional to response size
+                ));
+            } catch (NumberFormatException e) {
+                // Skip invalid entries
+            }
+        });
+        responseSizeChart.getData().clear();
+        responseSizeChart.getData().add(series);
     }
 
     private void setupActionDistributionChart() {
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Time");
-        yAxis.setLabel("Number of Actions");
+        actionDistributionChart.getData().clear();
+        Map<String, Map<String, Integer>> timeSeriesData = new TreeMap<>();
         
-        actionDistributionChart.setTitle("Action Distribution Over Time");
-        actionDistributionChart.getStyleClass().add("modern-area-chart");
-        
-        Map<String, Map<String, Integer>> timeActionCounts = new TreeMap<>();
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        
-        for (LogEntry log : recentLogs) {
-            String timeKey = log.getTimestamp().format(timeFormatter);
-            String action = log.getAction();
+        recentLogs.forEach(log -> {
+            String timeKey = log.getTimestamp().substring(11, 16); // HH:mm format
+            String action = log.getHttpMethod();
             
-            timeActionCounts.computeIfAbsent(timeKey, k -> new HashMap<>())
-                           .merge(action, 1, Integer::sum);
-        }
-        
+            timeSeriesData.computeIfAbsent(timeKey, k -> new HashMap<>())
+                         .merge(action, 1, Integer::sum);
+        });
+
         Map<String, XYChart.Series<String, Number>> seriesMap = new HashMap<>();
         
-        for (Map.Entry<String, Map<String, Integer>> timeEntry : timeActionCounts.entrySet()) {
-            for (Map.Entry<String, Integer> actionEntry : timeEntry.getValue().entrySet()) {
-                seriesMap.computeIfAbsent(actionEntry.getKey(), k -> {
-                    XYChart.Series<String, Number> series = new XYChart.Series<>();
-                    series.setName(k);
-                    return series;
-                }).getData().add(new XYChart.Data<>(timeEntry.getKey(), actionEntry.getValue()));
-            }
-        }
+        timeSeriesData.forEach((time, actions) -> {
+            actions.forEach((action, count) -> {
+                XYChart.Series<String, Number> series = seriesMap.computeIfAbsent(action,
+                    k -> {
+                        XYChart.Series<String, Number> s = new XYChart.Series<>();
+                        s.setName(action);
+                        return s;
+                    });
+                series.getData().add(new XYChart.Data<>(time, count));
+            });
+        });
         
         actionDistributionChart.getData().addAll(seriesMap.values());
     }
 
     private void setupMethodStatusHeatmap() {
         methodStatusHeatmap.getChildren().clear();
-        methodStatusHeatmap.setStyle("-fx-background-color: white; -fx-padding: 10;");
-        
+        methodStatusHeatmap.getColumnConstraints().clear();
+        methodStatusHeatmap.getRowConstraints().clear();
+
+        // Calculate method-status matrix
+        Map<String, Map<String, Integer>> matrix = new HashMap<>();
+        int maxValue = 0;
+
+        for (LogEntry log : recentLogs) {
+            String method = log.getHttpMethod();
+            String statusGroup = String.valueOf(log.getStatusCode()).substring(0, 1) + "xx";
+            
+            matrix.computeIfAbsent(method, k -> new HashMap<>())
+                 .merge(statusGroup, 1, Integer::sum);
+            
+            maxValue = Math.max(maxValue,
+                matrix.get(method).getOrDefault(statusGroup, 0));
+        }
+
         // Create headers
         int row = 0;
         int col = 0;
         
-        Set<String> methods = new TreeSet<>();
-        Set<String> statuses = new TreeSet<>();
-        
-        for (LogEntry log : recentLogs) {
-            methods.add(log.getHttpMethod());
-            statuses.add(log.getStatusCode());
+        // Add method headers
+        for (String method : matrix.keySet()) {
+            methodStatusHeatmap.add(new Label(method), ++col, 0);
         }
         
-        // Add column headers (HTTP Methods)
-        for (String method : methods) {
-            Label label = new Label(method);
-            label.getStyleClass().add("heatmap-header");
-            methodStatusHeatmap.add(label, ++col, 0);
+        // Add status code headers
+        String[] statusGroups = {"2xx", "3xx", "4xx", "5xx"};
+        for (String status : statusGroups) {
+            methodStatusHeatmap.add(new Label(status), 0, ++row);
         }
-        
-        // Add row headers (Status Codes)
-        row = 0;
-        for (String status : statuses) {
-            Label label = new Label(status);
-            label.getStyleClass().add("heatmap-header");
-            methodStatusHeatmap.add(label, 0, ++row);
-            
-            // Calculate and add heatmap cells
-            col = 0;
-            for (String method : methods) {
-                int count = methodStatusMatrix
-                    .getOrDefault(method, new HashMap<>())
-                    .getOrDefault(status, 0);
-                
-                StackPane cell = createHeatmapCell(count, 
-                    methods.stream().mapToInt(m -> 
-                        methodStatusMatrix
-                            .getOrDefault(m, new HashMap<>())
-                            .getOrDefault(status, 0))
-                    .max()
-                    .orElse(1));
-                
-                methodStatusHeatmap.add(cell, ++col, row);
+
+        // Add heatmap cells
+        for (String method : matrix.keySet()) {
+            Map<String, Integer> statusCounts = matrix.get(method);
+            row = 0;
+            for (String status : statusGroups) {
+                int value = statusCounts.getOrDefault(status, 0);
+                methodStatusHeatmap.add(
+                    createHeatmapCell(value, maxValue),
+                    col, ++row
+                );
             }
+            col++;
         }
     }
 
-    private StackPane createHeatmapCell(int value, int maxValue) {
-        StackPane cell = new StackPane();
-        double opacity = Math.min(1.0, value / (double) maxValue);
+    private Pane createHeatmapCell(int value, int maxValue) {
+        Pane cell = new Pane();
+        cell.setPrefSize(40, 40);
         
-        cell.setStyle(String.format(
-            "-fx-background-color: rgba(33, 150, 243, %.2f); " +
-            "-fx-min-width: 50; -fx-min-height: 50; " +
-            "-fx-border-color: white; -fx-border-width: 1;",
-            opacity));
+        double intensity = maxValue > 0 ? (double) value / maxValue : 0;
+        String color = String.format("rgb(0, %.0f, 0)", intensity * 255);
+        
+        cell.setStyle("-fx-background-color: " + color + ";");
         
         Label label = new Label(String.valueOf(value));
-        label.setStyle("-fx-text-fill: " + (opacity > 0.5 ? "white" : "#333") + ";");
-        
+        label.setStyle("-fx-text-fill: white;");
         cell.getChildren().add(label);
+        
         return cell;
     }
 
-    private void setupUserAgentRadarChart() {
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-        
-        for (Map.Entry<String, Integer> entry : userAgentCounts.entrySet()) {
-            String browser = extractBrowserInfo(entry.getKey());
-            pieData.add(new PieChart.Data(browser, entry.getValue()));
+    private void setupPolarChart() {
+        if (polarGauge == null) {
+            polarGauge = GaugeBuilder.create()
+                .skinType(Gauge.SkinType.GAUGE)
+                .prefSize(200, 200)
+                .sections(
+                    new Section(0, 33.3, "Low", javafx.scene.paint.Color.GREEN),
+                    new Section(33.3, 66.6, "Medium", javafx.scene.paint.Color.YELLOW),
+                    new Section(66.6, 100, "High", javafx.scene.paint.Color.RED)
+                )
+                .build();
+            polarChartContainer.getChildren().add(polarGauge);
         }
-        
-        userAgentChart.setData(pieData);
-        userAgentChart.setTitle("User Agent Distribution");
-        userAgentChart.getStyleClass().add("modern-polar-chart");
+
+        // Calculate success rate
+        long totalRequests = recentLogs.size();
+        long successfulRequests = recentLogs.stream()
+            .filter(log -> log.getStatusCode() >= 200 && log.getStatusCode() < 300)
+            .count();
+
+        double successRate = totalRequests > 0 
+            ? (double) successfulRequests / totalRequests * 100 
+            : 0;
+
+        polarGauge.setValue(successRate);
     }
 
-    private String extractBrowserInfo(String userAgent) {
-        if (userAgent == null) return "Unknown";
-        if (userAgent.contains("Firefox")) return "Firefox";
-        if (userAgent.contains("Chrome")) return "Chrome";
-        if (userAgent.contains("Safari")) return "Safari";
-        if (userAgent.contains("Edge")) return "Edge";
-        if (userAgent.contains("MSIE") || userAgent.contains("Trident")) return "IE";
-        return "Other";
-    }
-
-    @Override
     public void updateCharts(List<LogEntry> logs) {
         // Update new charts
         recentLogs = new LinkedList<>(logs);
@@ -403,7 +432,7 @@ public class LogAnalyticsController {
         for (LogEntry log : logs) {
             methodStatusMatrix
                 .computeIfAbsent(log.getHttpMethod(), k -> new HashMap<>())
-                .merge(log.getStatusCode(), 1, Integer::sum);
+                .merge(String.valueOf(log.getStatusCode()), 1, Integer::sum);
         }
         
         // Update action counts
@@ -422,7 +451,7 @@ public class LogAnalyticsController {
             setupResponseSizeBubbleChart();
             setupActionDistributionChart();
             setupMethodStatusHeatmap();
-            setupUserAgentRadarChart();
+            setupPolarChart();
         });
     }
 }

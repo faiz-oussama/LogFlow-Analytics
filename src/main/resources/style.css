@@ -1511,3 +1511,64 @@
 .logs-table .table-view .column-header .label {
     -fx-alignment: CENTER;
 }
+
+/* Chart Container Styles */
+.chart-container {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 0);
+}
+
+.heatmap-container {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 0);
+    -fx-alignment: center;
+}
+
+.heatmap-cell {
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-alignment: center;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.bubble-chart-symbol {
+    -fx-background-radius: 50%;
+    -fx-padding: 5;
+}
+
+.polar-gauge-container {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 0);
+    -fx-alignment: center;
+}
+
+.polar-gauge-chart {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+    -fx-alignment: center;
+}
+
+.polar-gauge-chart .chart-content {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+    -fx-alignment: center;
+}
+
+.polar-gauge-chart .chart-content .chart-series {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+    -fx-alignment: center;
+}
+
+.polar-gauge-chart .chart-content .chart-series .chart-data {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+    -fx-alignment: center;
+}

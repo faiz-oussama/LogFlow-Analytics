@@ -10,7 +10,6 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.LogAnalyticsController" stylesheets="@style.css">
     <top>
         <VBox spacing="0" styleClass="top-container" style="-fx-background-color: #f5f7fa;">
@@ -112,6 +111,41 @@
                             <NumberAxis label="Count"/>
                         </yAxis>
                     </BarChart>
+                </HBox>
+
+                <!-- New Charts Section -->
+                <HBox spacing="20">
+                    <VBox fx:id="polarChartContainer" styleClass="polar-gauge-container" prefWidth="300" prefHeight="300" alignment="CENTER">
+                        <Label text="Success Rate" style="-fx-font-size: 16px; -fx-font-weight: bold;" alignment="CENTER"/>
+                    </VBox>
+                    <BubbleChart fx:id="responseSizeChart" title="Response Size vs Status" legendVisible="false"
+                              HBox.hgrow="ALWAYS" prefHeight="300">
+                        <xAxis>
+                            <NumberAxis label="Response Size (KB)"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Status Code"/>
+                        </yAxis>
+                    </BubbleChart>
+                </HBox>
+
+                <HBox spacing="20">
+                    <GridPane fx:id="methodStatusHeatmap" styleClass="heatmap-container" prefHeight="300" HBox.hgrow="ALWAYS">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <Label text="Method-Status Distribution" GridPane.columnIndex="0" GridPane.rowIndex="0" 
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" GridPane.columnSpan="2"/>
+                    </GridPane>
+                    <StackedBarChart fx:id="actionDistributionChart" title="Action Distribution Over Time" legendVisible="true"
+                              HBox.hgrow="ALWAYS" prefHeight="300">
+                        <xAxis>
+                            <CategoryAxis label="Time"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Count"/>
+                        </yAxis>
+                    </StackedBarChart>
                 </HBox>
 
                 <VBox spacing="10" VBox.vgrow="ALWAYS">
