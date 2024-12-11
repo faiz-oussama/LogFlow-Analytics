@@ -252,6 +252,90 @@
     -fx-font-weight: 500;
 }
 
+/* Modern Date and Time Filter Styles */
+.filter-date,
+.filter-time {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 13px;
+    -fx-font-family: 'Segoe UI', system-ui, -apple-system;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.04), 4, 0, 0, 1);
+    -fx-transition: -fx-border-color 0.2s;
+}
+
+.filter-date:hover,
+.filter-time:hover {
+    -fx-border-color: #bdbdbd;
+}
+
+.filter-date:focused,
+.filter-time:focused {
+    -fx-border-color: #2196F3;
+    -fx-effect: dropshadow(gaussian, rgba(33, 150, 243, 0.1), 8, 0, 0, 2);
+}
+
+.filter-date .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 6px;
+}
+
+.filter-date .arrow-button .arrow {
+    -fx-background-color: #757575;
+    -fx-shape: "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z";
+}
+
+.to-label {
+    -fx-text-fill: #757575;
+    -fx-font-size: 13px;
+    -fx-padding: 0 8px;
+    -fx-font-family: 'Segoe UI', system-ui, -apple-system;
+}
+
+/* Calendar popup styling */
+.date-picker-popup {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-background-color: #f5f5f5;
+    -fx-padding: 8px;
+}
+
+.date-picker-popup .spinner .button {
+    -fx-background-color: transparent;
+    -fx-padding: 4px 8px;
+}
+
+.date-picker-popup .spinner .button:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+.date-picker-popup .calendar-grid {
+    -fx-background-color: white;
+    -fx-padding: 8px;
+}
+
+.date-picker-popup .calendar-grid .day-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #212121;
+    -fx-font-size: 12px;
+    -fx-padding: 6px;
+}
+
+.date-picker-popup .calendar-grid .day-cell:hover {
+    -fx-background-color: rgba(33, 150, 243, 0.1);
+}
+
+.date-picker-popup .calendar-grid .selected {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+}
+
 /* Table Styles */
 .table-view {
     -fx-background-color: white;

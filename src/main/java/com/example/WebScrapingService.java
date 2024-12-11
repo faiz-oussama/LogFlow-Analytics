@@ -76,66 +76,40 @@ public class WebScrapingService {
         return noHtml;
     }
 
-    private List<String> getAnswersForQuestion(String questionId) {
-        List<String> answers = new ArrayList<>();
-        try {
-            Map<String, String> params = new HashMap<>();
-            params.put("pagesize", String.valueOf(PAGE_SIZE));
-            params.put("order", "desc");
-            params.put("sort", "votes");
-            params.put("filter", "!9Z(-wwYGT"); // Custom filter to include answers
-            params.put("key", API_KEY);
+    private String getAnswersForQuestion(String questionId) throws IOException {
+        String answersUrl = API_BASE_URL + "/questions/" + questionId + "/answers";
+        Map<String, String> params = new HashMap<>();
+        params.put("order", "desc");
+        params.put("sort", "votes");
+        params.put("site", "stackoverflow");
+        params.put("filter", "withbody"); // Include the answer body
+        params.put("key", API_KEY);
 
-            URL url = createQuery("questions/" + questionId + "/answers", params);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
+        Request request = new Request.Builder()
+                .url(createQuery("questions/" + questionId + "/answers", params))
+                .build();
 
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    System.err.println("Error: " + response.code());
-                    return answers;
-                }
-
-                String responseBody = response.body().string();
-                JsonObject jsonResponse = gson.fromJson(responseBody, JsonObject.class);
-                JsonArray items = jsonResponse.getAsJsonArray("items");
-
-                if (items != null) {
-                    for (JsonElement item : items) {
-                        JsonObject answer = item.getAsJsonObject();
-                        String body = answer.has("body") ? 
-                            cleanHtmlContent(answer.get("body").getAsString())
-                            : "";
-                        
-                        if (!body.isEmpty()) {
-                            // Truncate long answers
-                            if (body.length() > 200) {
-                                body = body.substring(0, 200) + "...";
-                            }
-                            answers.add(body);
-                        }
-                    }
-                }
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() || response.body() == null) {
+                System.err.println("Error: " + response.code());
+                return "";
             }
-        } catch (Exception e) {
-            System.err.println("Error fetching answers for question " + questionId + ": " + e.getMessage());
-            e.printStackTrace();
+
+            return response.body().string();
         }
-        return answers;
     }
 
     public List<String> searchSolutions(String query) {
         List<String> solutions = new ArrayList<>();
         try {
             Map<String, String> params = new HashMap<>();
-            params.put("pagesize", String.valueOf(PAGE_SIZE));
             params.put("order", "desc");
             params.put("sort", "relevance");
             params.put("q", query);
-            params.put("filter", "!9Z(-wwYGT"); // Custom filter to include question body and answers
+            params.put("filter", "!9Z(-wwYGT");
             params.put("answers", "1");
             params.put("key", API_KEY);
+            params.put("site", "stackoverflow");
 
             URL url = createQuery("search/advanced", params);
             Request request = new Request.Builder()
@@ -162,23 +136,29 @@ public class WebScrapingService {
                             : "";
 
                         String questionId = question.get("question_id").getAsString();
-                        List<String> answers = getAnswersForQuestion(questionId);
+
+                        // Get answers for this question
+                        String answersResponse = getAnswersForQuestion(questionId);
+                        JsonObject answersJson = gson.fromJson(answersResponse, JsonObject.class);
+                        JsonArray answers = answersJson.getAsJsonArray("items");
 
                         StringBuilder solution = new StringBuilder();
-                        solution.append("<div class='solution-container'>")
-                               .append("<h1 class='solution-title'>Problem Summary</h1>")
-                               .append("<div class='solution-content'>").append(title).append("</div>")
-                               .append("<h2 class='solution-section'>Solutions Found</h2>")
-                               .append("<h3 class='solution-subsection'>Question Details</h3>")
-                               .append("<div class='solution-content'>").append(body).append("</div>");
+                        solution.append("<div class='solution-container'>");
+                        solution.append("<h1 class='solution-title'>Problem Summary</h1>");
+                        solution.append("<div class='solution-content'>").append(title).append("</div>");
                         
-                        if (!answers.isEmpty()) {
-                            solution.append("<h3 class='solution-subsection'>Answers</h3>");
-                            for (int i = 0; i < answers.size(); i++) {
-                                solution.append("<div class='answer-container'>")
-                                       .append("<h4 class='answer-title'>Answer ").append(i + 1).append("</h4>")
-                                       .append("<div class='solution-content'>").append(answers.get(i)).append("</div>")
-                                       .append("</div>");
+                        if (answers != null) {
+                            solution.append("<h2 class='solution-section'>Solutions Found</h2>");
+                            for (JsonElement answer : answers) {
+                                JsonObject answerJson = answer.getAsJsonObject();
+                                String answerBody = answerJson.has("body") ? 
+                                    cleanHtmlContent(answerJson.get("body").getAsString())
+                                    : "";
+                                
+                                solution.append("<div class='answer-container'>");
+                                solution.append("<h4 class='answer-title'>Answer</h4>");
+                                solution.append("<div class='solution-content'>").append(answerBody).append("</div>");
+                                solution.append("</div>");
                             }
                         }
 

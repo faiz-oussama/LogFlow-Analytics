@@ -28,6 +28,10 @@ public class LogAnalyticsController {
     @FXML private Label timeRangeLabel;
     @FXML private Label filterLabel;
     @FXML private Label chatbotLabel;
+    @FXML private BubbleChart<Number, Number> responseSizeChart;
+    @FXML private StackedAreaChart<String, Number> actionDistributionChart;
+    @FXML private GridPane methodStatusHeatmap;
+    @FXML private PolarChart userAgentChart;
 
     private Map<String, Integer> logLevelCounts = new HashMap<>();
     private Map<String, Integer> httpMethodCounts = new HashMap<>();
@@ -35,6 +39,9 @@ public class LogAnalyticsController {
     private Map<String, EndpointStats> endpointStats = new HashMap<>();
     private LinkedList<LogEntry> recentLogs = new LinkedList<>();
     private static final int MAX_TIME_SERIES_POINTS = 20;
+    private Map<String, Map<String, Integer>> methodStatusMatrix = new HashMap<>();
+    private Map<String, Integer> actionCounts = new HashMap<>();
+    private Map<String, Integer> userAgentCounts = new HashMap<>();
 
     @FXML
     public void initialize() {
@@ -95,6 +102,11 @@ public class LogAnalyticsController {
         updateHttpMethodsChart();
         updateStatusCodesChart();
         updateTimeSeriesChart();
+        // Initialize new charts
+        setupResponseSizeBubbleChart();
+        setupActionDistributionChart();
+        setupMethodStatusHeatmap();
+        setupUserAgentRadarChart();
     }
 
     public void processNewLog(LogEntry logEntry) {
@@ -148,6 +160,11 @@ public class LogAnalyticsController {
         updateHttpMethodsChart();
         updateStatusCodesChart();
         updateTimeSeriesChart();
+        // Update new charts
+        setupResponseSizeBubbleChart();
+        setupActionDistributionChart();
+        setupMethodStatusHeatmap();
+        setupUserAgentRadarChart();
     }
 
     private void updateLogLevelChart() {
@@ -217,5 +234,195 @@ public class LogAnalyticsController {
         String selectedRange = timeRangeComboBox.getValue();
         // Reset counters and recalculate based on time range
         // This would filter logs based on the selected time range
+    }
+
+    private void setupResponseSizeBubbleChart() {
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Response Size (KB)");
+        yAxis.setLabel("Status Code");
+        
+        responseSizeChart.setTitle("Response Size vs Status Code Distribution");
+        responseSizeChart.getStyleClass().add("modern-bubble-chart");
+        
+        ObservableList<BubbleChart.Series<Number, Number>> bubbleData = FXCollections.observableArrayList();
+        Map<String, List<Double>> responseData = new HashMap<>();
+        
+        for (LogEntry log : recentLogs) {
+            double responseSize = Double.parseDouble(log.getResponseSize()) / 1024.0; // Convert to KB
+            int statusCode = Integer.parseInt(log.getStatusCode());
+            responseData.computeIfAbsent(log.getStatusCode(), k -> new ArrayList<>()).add(responseSize);
+        }
+        
+        for (Map.Entry<String, List<Double>> entry : responseData.entrySet()) {
+            BubbleChart.Series<Number, Number> series = new BubbleChart.Series<>();
+            series.setName("Status " + entry.getKey());
+            
+            double avgSize = entry.getValue().stream().mapToDouble(Double::doubleValue).average().orElse(0);
+            double frequency = entry.getValue().size();
+            
+            series.getData().add(new BubbleChart.Data<>(avgSize, Integer.parseInt(entry.getKey()), frequency / 5));
+            bubbleData.add(series);
+        }
+        
+        responseSizeChart.setData(bubbleData);
+    }
+
+    private void setupActionDistributionChart() {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Time");
+        yAxis.setLabel("Number of Actions");
+        
+        actionDistributionChart.setTitle("Action Distribution Over Time");
+        actionDistributionChart.getStyleClass().add("modern-area-chart");
+        
+        Map<String, Map<String, Integer>> timeActionCounts = new TreeMap<>();
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        
+        for (LogEntry log : recentLogs) {
+            String timeKey = log.getTimestamp().format(timeFormatter);
+            String action = log.getAction();
+            
+            timeActionCounts.computeIfAbsent(timeKey, k -> new HashMap<>())
+                           .merge(action, 1, Integer::sum);
+        }
+        
+        Map<String, XYChart.Series<String, Number>> seriesMap = new HashMap<>();
+        
+        for (Map.Entry<String, Map<String, Integer>> timeEntry : timeActionCounts.entrySet()) {
+            for (Map.Entry<String, Integer> actionEntry : timeEntry.getValue().entrySet()) {
+                seriesMap.computeIfAbsent(actionEntry.getKey(), k -> {
+                    XYChart.Series<String, Number> series = new XYChart.Series<>();
+                    series.setName(k);
+                    return series;
+                }).getData().add(new XYChart.Data<>(timeEntry.getKey(), actionEntry.getValue()));
+            }
+        }
+        
+        actionDistributionChart.getData().addAll(seriesMap.values());
+    }
+
+    private void setupMethodStatusHeatmap() {
+        methodStatusHeatmap.getChildren().clear();
+        methodStatusHeatmap.setStyle("-fx-background-color: white; -fx-padding: 10;");
+        
+        // Create headers
+        int row = 0;
+        int col = 0;
+        
+        Set<String> methods = new TreeSet<>();
+        Set<String> statuses = new TreeSet<>();
+        
+        for (LogEntry log : recentLogs) {
+            methods.add(log.getHttpMethod());
+            statuses.add(log.getStatusCode());
+        }
+        
+        // Add column headers (HTTP Methods)
+        for (String method : methods) {
+            Label label = new Label(method);
+            label.getStyleClass().add("heatmap-header");
+            methodStatusHeatmap.add(label, ++col, 0);
+        }
+        
+        // Add row headers (Status Codes)
+        row = 0;
+        for (String status : statuses) {
+            Label label = new Label(status);
+            label.getStyleClass().add("heatmap-header");
+            methodStatusHeatmap.add(label, 0, ++row);
+            
+            // Calculate and add heatmap cells
+            col = 0;
+            for (String method : methods) {
+                int count = methodStatusMatrix
+                    .getOrDefault(method, new HashMap<>())
+                    .getOrDefault(status, 0);
+                
+                StackPane cell = createHeatmapCell(count, 
+                    methods.stream().mapToInt(m -> 
+                        methodStatusMatrix
+                            .getOrDefault(m, new HashMap<>())
+                            .getOrDefault(status, 0))
+                    .max()
+                    .orElse(1));
+                
+                methodStatusHeatmap.add(cell, ++col, row);
+            }
+        }
+    }
+
+    private StackPane createHeatmapCell(int value, int maxValue) {
+        StackPane cell = new StackPane();
+        double opacity = Math.min(1.0, value / (double) maxValue);
+        
+        cell.setStyle(String.format(
+            "-fx-background-color: rgba(33, 150, 243, %.2f); " +
+            "-fx-min-width: 50; -fx-min-height: 50; " +
+            "-fx-border-color: white; -fx-border-width: 1;",
+            opacity));
+        
+        Label label = new Label(String.valueOf(value));
+        label.setStyle("-fx-text-fill: " + (opacity > 0.5 ? "white" : "#333") + ";");
+        
+        cell.getChildren().add(label);
+        return cell;
+    }
+
+    private void setupUserAgentRadarChart() {
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+        
+        for (Map.Entry<String, Integer> entry : userAgentCounts.entrySet()) {
+            String browser = extractBrowserInfo(entry.getKey());
+            pieData.add(new PieChart.Data(browser, entry.getValue()));
+        }
+        
+        userAgentChart.setData(pieData);
+        userAgentChart.setTitle("User Agent Distribution");
+        userAgentChart.getStyleClass().add("modern-polar-chart");
+    }
+
+    private String extractBrowserInfo(String userAgent) {
+        if (userAgent == null) return "Unknown";
+        if (userAgent.contains("Firefox")) return "Firefox";
+        if (userAgent.contains("Chrome")) return "Chrome";
+        if (userAgent.contains("Safari")) return "Safari";
+        if (userAgent.contains("Edge")) return "Edge";
+        if (userAgent.contains("MSIE") || userAgent.contains("Trident")) return "IE";
+        return "Other";
+    }
+
+    @Override
+    public void updateCharts(List<LogEntry> logs) {
+        // Update new charts
+        recentLogs = new LinkedList<>(logs);
+        
+        // Update method-status matrix
+        methodStatusMatrix.clear();
+        for (LogEntry log : logs) {
+            methodStatusMatrix
+                .computeIfAbsent(log.getHttpMethod(), k -> new HashMap<>())
+                .merge(log.getStatusCode(), 1, Integer::sum);
+        }
+        
+        // Update action counts
+        actionCounts.clear();
+        for (LogEntry log : logs) {
+            actionCounts.merge(log.getAction(), 1, Integer::sum);
+        }
+        
+        // Update user agent counts
+        userAgentCounts.clear();
+        for (LogEntry log : logs) {
+            userAgentCounts.merge(log.getUserAgent(), 1, Integer::sum);
+        }
+        
+        Platform.runLater(() -> {
+            setupResponseSizeBubbleChart();
+            setupActionDistributionChart();
+            setupMethodStatusHeatmap();
+            setupUserAgentRadarChart();
+        });
     }
 }

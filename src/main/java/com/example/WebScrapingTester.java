@@ -8,9 +8,6 @@ public class WebScrapingTester {
         String[] queries = {
             "how to implement JWT authentication in Java",
             "spring boot rest api example",
-            "java nullpointerexception best practices",
-            "java stream api tutorial",
-            "spring security oauth2 implementation"
         };
         
         System.out.println("Starting WebScraping Test\n");
