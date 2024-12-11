@@ -85,12 +85,12 @@
             </HBox>
             <TableView fx:id="logsTable" styleClass="logs-table" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="columnIP" text="Client IP" prefWidth="160" style="-fx-alignment: CENTER;"/>
-                    <TableColumn fx:id="columnTimestamp" text="Timestamp" prefWidth="210" style="-fx-alignment: CENTER;"/>
-                    <TableColumn fx:id="columnRequestType" text="Request Type" prefWidth="140" style="-fx-alignment: CENTER;"/>
-                    <TableColumn fx:id="columnStatusCode" text="Status Code" prefWidth="140" style="-fx-alignment: CENTER;"/>
-                    <TableColumn fx:id="columnAction" text="Action" prefWidth="180" style="-fx-alignment: CENTER;"/>
-                    <TableColumn fx:id="columnLogLevel" text="Log Level" prefWidth="140" style="-fx-alignment: CENTER;"/>
+                    <TableColumn fx:id="columnIP" text="Client IP" prefWidth="160" styleClass="table-column"/>
+                    <TableColumn fx:id="columnTimestamp" text="Timestamp" prefWidth="210" styleClass="table-column"/>
+                    <TableColumn fx:id="columnRequestType" text="Request Type" prefWidth="140" styleClass="table-column"/>
+                    <TableColumn fx:id="columnStatusCode" text="Status Code" prefWidth="140" styleClass="table-column"/>
+                    <TableColumn fx:id="columnAction" text="Action" prefWidth="180" styleClass="table-column"/>
+                    <TableColumn fx:id="columnLogLevel" text="Log Level" prefWidth="140" styleClass="table-column"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

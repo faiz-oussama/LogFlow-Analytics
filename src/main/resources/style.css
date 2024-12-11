@@ -276,7 +276,7 @@
 }
 
 .table-view .column-header .label {
-    -fx-alignment: CENTER_LEFT;
+    -fx-alignment: CENTER;
     -fx-padding: 10 5;
 }
 
@@ -296,7 +296,7 @@
 }
 
 .table-view .table-cell {
-    -fx-alignment: CENTER_LEFT;
+    -fx-alignment: CENTER;
     -fx-font-size: 14px;
     -fx-text-fill: #2d3436;
     -fx-padding: 10 15;
@@ -861,6 +861,9 @@
     -fx-padding: 10;
     -fx-alignment: CENTER;
 }
+.table-cell {
+    -fx-alignment: CENTER;
+}
 
 .logs-table1 .table-row-cell {
     -fx-background-color: transparent;
@@ -1395,4 +1398,32 @@
         background-color: #f6f8fa;
         font-weight: bold;
     }
+}
+
+.logs-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 8;
+}
+
+.logs-table .table-row-cell:hover {
+    -fx-background-color: rgba(67, 97, 238, 0.1);
+}
+
+.logs-table .table-row-cell:selected {
+    -fx-background-color: -fx-primary-light;
+    -fx-text-fill: white;
+}
+
+.logs-table .table-view .column-header-background {
+    -fx-background-color: -fx-primary;
+}
+
+.logs-table .table-view .column-header {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: black;
+}
+
+.logs-table .table-view .column-header .label {
+    -fx-alignment: CENTER;
 }

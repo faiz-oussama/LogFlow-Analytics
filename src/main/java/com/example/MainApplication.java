@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
+import javafx.scene.image.Image;
 public class MainApplication extends Application {
     private Parent logVisRoot;
     private Parent analyticsRoot;
@@ -50,14 +50,14 @@ public class MainApplication extends Application {
         
         setupViewSwitching();
         
-        mainContainer.getChildren().add(logVisRoot);
+        mainContainer.getChildren().add(analyticsRoot);
         
         Scene scene = new Scene(mainContainer, 1280, 670);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         
         primaryStage.setTitle("LogFlow Analytics App");
         primaryStage.setScene(scene);
-        
+        primaryStage.getIcons().add(new Image(getClass().getResource("/icon.png").toExternalForm()));    
         primaryStage.setOnCloseRequest(event -> {
             logVisController.shutdown();
             Platform.exit();

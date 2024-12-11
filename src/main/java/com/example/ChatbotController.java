@@ -20,7 +20,8 @@ import javafx.application.Platform;
 import java.util.stream.Collectors;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
@@ -193,10 +194,12 @@ public class ChatbotController implements Initializable {
 
     private static final String USER_STYLES = BASE_STYLES + """
             body {
-                color: white;
+                color: #2d3436;
+                margin: 0;
+                padding: 0;
             }
             a {
-                color: #9fccff;
+                color: #0366d6;
             }
             """;
 
@@ -597,11 +600,35 @@ public class ChatbotController implements Initializable {
 
     private void addBotMessage(String message) {
         Platform.runLater(() -> {
-            WebView webView = new WebView();
-            webView.getEngine().loadContent(message);
-            webView.setPrefHeight(200);
-            webView.setPrefWidth(400);
-            chatHistory.getChildren().add(webView);
+            // Check if the message contains HTML tags
+            if (message.contains("<html>") || message.contains("<div>") || message.contains("<p>")) {
+                // Use WebView for HTML content
+                WebView webView = new WebView();
+                String styledMessage = "<html><head><style>" + USER_STYLES + 
+                    "</style></head><body>" + message + "</body></html>";
+                webView.getEngine().loadContent(styledMessage);
+                webView.setMaxHeight(Double.MAX_VALUE);
+                webView.setPrefWidth(650);
+                
+                HBox messageContainer = new HBox(webView);
+                messageContainer.setAlignment(Pos.CENTER_LEFT);
+                messageContainer.setPadding(new Insets(10));
+                messageContainer.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 25; -fx-min-width: 650; -fx-max-width: 650; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+                
+                chatHistory.getChildren().add(messageContainer);
+            } else {
+                // Use Label for simple text content
+                Label textLabel = new Label(message);
+                textLabel.setWrapText(true);
+                textLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #2d3436;");
+                
+                VBox messageContainer = new VBox(textLabel);
+                messageContainer.setPadding(new Insets(12, 16, 12, 16));
+                messageContainer.setMaxWidth(650);
+                messageContainer.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+                
+                chatHistory.getChildren().add(messageContainer);
+            }
             scrollToBottom();
         });
     }
@@ -656,7 +683,9 @@ public class ChatbotController implements Initializable {
             .average()
             .orElse(0.0);
 
-        response.append(String.format("\nAverage requests per hour: %.2f", avgRequestsPerHour));
+        response.append(String.format("\nAverage requests per hour: %.2f", 
+            avgRequestsPerHour));
+
         return response.toString();
     }
 
