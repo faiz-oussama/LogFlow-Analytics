@@ -18,9 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class WebScrapingService {
-    private static final String API_BASE_URL = "https://api.stackexchange.com/2.1";
+    private static final String API_BASE_URL = "https://api.stackexchange.com/2.3";
     private static final String SITE = "stackoverflow";
     private static final int PAGE_SIZE = 3;
     private static final String API_KEY = "rl_GYbCkhtQ62PF1nNRXjxYPE41A";
@@ -57,6 +58,24 @@ public class WebScrapingService {
         return new URL(baseUrl.toString());
     }
 
+    private String cleanHtmlContent(String html) {
+        if (html == null || html.isEmpty()) {
+            return "";
+        }
+        // Remove HTML tags
+        String noHtml = html.replaceAll("<[^>]+>", "");
+        // Replace HTML entities
+        noHtml = noHtml.replaceAll("&quot;", "\"")
+                      .replaceAll("&amp;", "&")
+                      .replaceAll("&lt;", "<")
+                      .replaceAll("&gt;", ">")
+                      .replaceAll("&nbsp;", " ")
+                      .replaceAll("&#39;", "'");
+        // Remove extra whitespace
+        noHtml = noHtml.replaceAll("\\s+", " ").trim();
+        return noHtml;
+    }
+
     private List<String> getAnswersForQuestion(String questionId) {
         List<String> answers = new ArrayList<>();
         try {
@@ -68,8 +87,6 @@ public class WebScrapingService {
             params.put("key", API_KEY);
 
             URL url = createQuery("questions/" + questionId + "/answers", params);
-            System.out.println("Fetching answers for question " + questionId + " with URL: " + url);
-
             Request request = new Request.Builder()
                     .url(url)
                     .build();
@@ -81,7 +98,6 @@ public class WebScrapingService {
                 }
 
                 String responseBody = response.body().string();
-                System.out.println("Response Body: " + responseBody);
                 JsonObject jsonResponse = gson.fromJson(responseBody, JsonObject.class);
                 JsonArray items = jsonResponse.getAsJsonArray("items");
 
@@ -89,10 +105,16 @@ public class WebScrapingService {
                     for (JsonElement item : items) {
                         JsonObject answer = item.getAsJsonObject();
                         String body = answer.has("body") ? 
-                            answer.get("body").getAsString().substring(0, Math.min(200, answer.get("body").getAsString().length())) + "..."
+                            cleanHtmlContent(answer.get("body").getAsString())
                             : "";
-
-                        answers.add(body);
+                        
+                        if (!body.isEmpty()) {
+                            // Truncate long answers
+                            if (body.length() > 200) {
+                                body = body.substring(0, 200) + "...";
+                            }
+                            answers.add(body);
+                        }
                     }
                 }
             }
@@ -117,8 +139,6 @@ public class WebScrapingService {
             params.put("key", API_KEY);
 
             URL url = createQuery("search/advanced", params);
-            System.out.println("Searching Stack Overflow with URL: " + url);
-
             Request request = new Request.Builder()
                     .url(url)
                     .build();
@@ -130,59 +150,52 @@ public class WebScrapingService {
                 }
 
                 String responseBody = response.body().string();
-                System.out.println("Response Body: " + responseBody);
                 JsonObject jsonResponse = gson.fromJson(responseBody, JsonObject.class);
                 JsonArray items = jsonResponse.getAsJsonArray("items");
 
                 if (items != null) {
                     for (JsonElement item : items) {
                         JsonObject question = item.getAsJsonObject();
-                        String title = question.get("title").getAsString();
+                        String title = cleanHtmlContent(question.get("title").getAsString());
                         String link = question.get("link").getAsString();
-                        boolean isAnswered = question.get("is_answered").getAsBoolean();
-                        int score = question.get("score").getAsInt();
                         String body = question.has("body") ? 
-                            question.get("body").getAsString()
+                            cleanHtmlContent(question.get("body").getAsString())
                             : "";
 
-                        // Fetch answers for this question
                         String questionId = question.get("question_id").getAsString();
                         List<String> answers = getAnswersForQuestion(questionId);
 
                         StringBuilder solution = new StringBuilder();
-                        solution.append("Problem Summary:\n")
-                               .append(title)
-                               .append("\n\nSolutions Found:\n")
-                               .append("Question Details:\n")
-                               .append(body)
-                               .append("\n");
-
-                        // Add answers in separate blocks
+                        solution.append("<div class='solution-container'>")
+                               .append("<h1 class='solution-title'>Problem Summary</h1>")
+                               .append("<div class='solution-content'>").append(title).append("</div>")
+                               .append("<h2 class='solution-section'>Solutions Found</h2>")
+                               .append("<h3 class='solution-subsection'>Question Details</h3>")
+                               .append("<div class='solution-content'>").append(body).append("</div>");
+                        
                         if (!answers.isEmpty()) {
-                            solution.append("\nAnswers:\n");
+                            solution.append("<h3 class='solution-subsection'>Answers</h3>");
                             for (int i = 0; i < answers.size(); i++) {
-                                solution.append("\nAnswer ").append(i + 1).append(":\n")
-                                       .append(answers.get(i))
-                                       .append("\n");
+                                solution.append("<div class='answer-container'>")
+                                       .append("<h4 class='answer-title'>Answer ").append(i + 1).append("</h4>")
+                                       .append("<div class='solution-content'>").append(answers.get(i)).append("</div>")
+                                       .append("</div>");
                             }
                         }
 
                         // Tools section
-                        solution.append("\nTools or Resources Needed:\n")
-                               .append("- Java Development Environment\n")
-                               .append("- Required dependencies mentioned in the solution\n");
-
-                        // Additional Notes section
-                        solution.append("\nAdditional Notes:\n")
-                               .append("Score: ").append(score);
-                        
-                        if (isAnswered) {
-                            solution.append(" (Answered)");
-                        }
+                        solution.append("<h3 class='solution-subsection'>Tools or Resources Needed</h3>")
+                               .append("<ul class='resource-list'>")
+                               .append("<li>Java Development Environment</li>")
+                               .append("<li>Required dependencies mentioned in the solution</li>")
+                               .append("</ul>");
                         
                         // References section
-                        solution.append("\n\nReferences:\n")
-                               .append("- Stack Overflow Answer: ").append(link);
+                        solution.append("<h3 class='solution-subsection'>References</h3>")
+                               .append("<ul class='resource-list'>")
+                               .append("<li><a href='").append(link).append("'>Stack Overflow Answer</a></li>")
+                               .append("</ul>")
+                               .append("</div>");
 
                         solutions.add(solution.toString());
                     }

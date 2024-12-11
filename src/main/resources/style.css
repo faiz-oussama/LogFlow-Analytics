@@ -15,14 +15,16 @@
 
 /* Main Container Styles */
 .top-container {
-    -fx-background-color: linear-gradient(to right, #4895ef, #4cc9f0);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 12, 0, 0, 2);
+    -fx-background-color: -fx-background;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 1);
 }
 
 /* Navbar Styles */
 .navbar {
-    -fx-background-color: transparent;
-    -fx-padding: 20 30;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 8, 0, 0, 1);
+    -fx-border-color: rgba(0, 0, 0, 0.05);
+    -fx-border-width: 0 0 1 0;
 }
 
 .nav-items {
@@ -30,78 +32,122 @@
 }
 
 .nav-item {
-    -fx-text-fill: rgba(255, 255, 255, 0.9);
-    -fx-font-size: 15px;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
     -fx-font-weight: 600;
-    -fx-padding: 12 24;
-    -fx-background-radius: 12;
+    -fx-padding: 10 16;
+    -fx-background-radius: 8;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
-    -fx-transition: all 0.3s ease;
+    -fx-alignment: center;
+    -fx-graphic-text-gap: 8;
+}
+
+.nav-item .ikonli-font-icon {
+    -fx-fill: #64748b;
 }
 
 .nav-item:hover {
-    -fx-text-fill: white;
-    -fx-background-color: rgba(255, 255, 255, 0.15);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 2);
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
+    -fx-text-fill: -fx-primary;
+    -fx-background-color: rgba(67, 97, 238, 0.08);
+}
+
+.nav-item:hover .ikonli-font-icon {
+    -fx-fill: -fx-primary;
 }
 
 .nav-item-active {
-    -fx-text-fill: white;
-    -fx-background-color: rgba(255, 255, 255, 0.2);
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 2);
+    -fx-text-fill: -fx-primary;
+    -fx-background-color: rgba(67, 97, 238, 0.1);
+}
+
+.nav-item-active .ikonli-font-icon {
+    -fx-fill: -fx-primary;
 }
 
 /* Search Field Styles */
 .search-container {
-    -fx-background-color: rgba(255, 255, 255, 0.2);
-    -fx-background-radius: 12;
-    -fx-padding: 0 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16;
+    -fx-spacing: 8;
+}
+
+.search-icon {
+    -fx-fill: #94a3b8;
 }
 
 .search-field {
     -fx-background-color: transparent;
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #94a3b8;
     -fx-font-size: 14px;
-    -fx-font-weight: 500;
-    -fx-padding: 12 16;
-    -fx-min-width: 280px;
+    -fx-padding: 4 0;
+    -fx-min-width: 200px;
 }
 
 /* Header Section Styles */
 .header-section {
-    -fx-background-color: -fx-card-background;
-    -fx-background-radius: 16;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 1);
+    -fx-background-color: white;
     -fx-padding: 30;
-    -fx-margin: 25;
 }
 
 .title-label {
-    -fx-font-size: 32px;
-    -fx-font-weight: 800;
-    -fx-text-fill: #2d3436;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
 }
 
 .subtitle-label {
-    -fx-font-size: 15px;
-    -fx-font-weight: 500;
-    -fx-text-fill: #636e72;
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748b;
 }
 
 .live-badge {
-    -fx-background-color: -fx-accent;
+    -fx-background-color: -fx-success;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 12;
+    -fx-background-radius: 100;
+}
+
+/* Action Buttons */
+.action-button {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-graphic-text-gap: 8;
+    -fx-cursor: hand;
+}
+
+.action-button:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+.action-button .ikonli-font-icon {
+    -fx-fill: #475569;
+}
+
+.action-button-primary {
+    -fx-background-color: -fx-primary;
     -fx-text-fill: white;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-padding: 6 16;
-    -fx-background-radius: 20;
-    -fx-effect: dropshadow(gaussian, rgba(76, 201, 240, 0.3), 8, 0, 0, 0);
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-graphic-text-gap: 8;
+    -fx-cursor: hand;
+}
+
+.action-button-primary:hover {
+    -fx-background-color: derive(-fx-primary, 10%);
+}
+
+.action-button-primary .ikonli-font-icon {
+    -fx-fill: white;
 }
 
 /* Modern Button Styles */

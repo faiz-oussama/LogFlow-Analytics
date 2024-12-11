@@ -34,9 +34,7 @@ public class WebScrapingTester {
                 e.printStackTrace();
             }
             
-            System.out.println("\n=========================\n");
-            
-            // Add a small delay between queries to avoid rate limiting
+            System.out.println("\n=========================\n");            
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

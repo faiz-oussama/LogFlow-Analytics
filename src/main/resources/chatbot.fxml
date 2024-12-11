@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.shape.Circle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.example.ChatbotController" stylesheets="@style.css">
@@ -10,27 +11,39 @@
         <VBox spacing="0" styleClass="top-container">
             <HBox fx:id="navbar" alignment="CENTER_LEFT" styleClass="navbar">
                 <padding>
-                    <Insets top="15" right="25" bottom="15" left="25"/>
+                    <Insets top="18" right="30" bottom="18" left="30"/>
                 </padding>
-                <HBox fx:id="navItems" spacing="35" alignment="CENTER" styleClass="nav-items">
+                <HBox fx:id="navItems" spacing="40" alignment="CENTER" styleClass="nav-items">
                     <padding>
-                        <Insets left="45"/>
+                        <Insets left="50"/>
                     </padding>
-                    <Label fx:id="dashboardLabel" text="Dashboard" styleClass="nav-item" />
-                    <Label fx:id="logsLabel" text="Logs" styleClass="nav-item" />
-                    <Label fx:id="filterLabel" text="Filter" styleClass="nav-item" />
-                    <Label fx:id="chatbotLabel" text="Chatbot" styleClass="nav-item, nav-item-active" />
+                    <Label fx:id="dashboardLabel" text="Dashboard" styleClass="nav-item">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-chart-line" iconSize="16"/>
+                        </graphic>
+                    </Label>
+                    <Label fx:id="logsLabel" text="Logs" styleClass="nav-item">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-list-ul" iconSize="16"/>
+                        </graphic>
+                    </Label>
+                    <Label fx:id="filterLabel" text="Filter" styleClass="nav-item">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-filter" iconSize="16"/>
+                        </graphic>
+                    </Label>
+                    <Label fx:id="chatbotLabel" text="Chatbot" styleClass="nav-item, nav-item-active">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-robot" iconSize="16"/>
+                        </graphic>
+                    </Label>
                 </HBox>
                 <Region HBox.hgrow="ALWAYS" />
-                <HBox alignment="CENTER" spacing="20" styleClass="nav-controls">
-                    <HBox styleClass="search-container">
-                        <TextField fx:id="searchField" promptText="Search logs..." styleClass="search-field" />
-                    </HBox>
-                    <StackPane styleClass="theme-toggle-container">
-                        <ToggleButton fx:id="darkModeToggle" styleClass="theme-toggle" />
-                    </StackPane>
+                <HBox styleClass="search-container" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-search" iconSize="14" styleClass="search-icon"/>
+                    <TextField promptText="Search logs..." styleClass="search-field"/>
                 </HBox>
-            </HBox>
+            </HBox> 
         </VBox>
     </top>
     <center>

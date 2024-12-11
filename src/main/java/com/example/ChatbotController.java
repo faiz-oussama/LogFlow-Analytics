@@ -86,6 +86,68 @@ public class ChatbotController implements Initializable {
                 line-height: 1.5;
                 font-size: 14px;
             }
+            .solution-container {
+                background: #ffffff;
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .solution-title {
+                font-size: 24px;
+                font-weight: 600;
+                color: #2d3436;
+                margin: 0 0 16px 0;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #00b894;
+            }
+            .solution-section {
+                font-size: 20px;
+                font-weight: 600;
+                color: #2d3436;
+                margin: 24px 0 16px 0;
+            }
+            .solution-subsection {
+                font-size: 18px;
+                font-weight: 500;
+                color: #2d3436;
+                margin: 20px 0 12px 0;
+            }
+            .solution-content {
+                background: #f8f9fa;
+                padding: 16px;
+                border-radius: 6px;
+                margin: 8px 0;
+            }
+            .answer-container {
+                margin: 16px 0;
+                padding: 16px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                border-left: 4px solid #00b894;
+            }
+            .answer-title {
+                font-size: 16px;
+                font-weight: 500;
+                color: #2d3436;
+                margin: 0 0 8px 0;
+            }
+            .resource-list {
+                list-style-type: none;
+                padding: 0;
+                margin: 8px 0;
+            }
+            .resource-list li {
+                padding: 8px 0;
+                margin: 4px 0;
+                display: flex;
+                align-items: center;
+            }
+            .resource-list li:before {
+                content: "•";
+                color: #00b894;
+                font-weight: bold;
+                margin-right: 8px;
+            }
             pre {
                 background-color: rgba(0, 0, 0, 0.04);
                 padding: 12px;
