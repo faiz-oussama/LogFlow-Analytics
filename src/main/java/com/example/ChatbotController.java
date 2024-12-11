@@ -25,6 +25,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import javafx.animation.FadeTransition;
+import javafx.scene.web.WebView;
 
 public class ChatbotController implements Initializable {
     @FXML private ScrollPane chatScrollPane;
@@ -595,24 +596,14 @@ public class ChatbotController implements Initializable {
     }
 
     private void addBotMessage(String message) {
-        HBox messageContainer = new HBox();
-        messageContainer.getStyleClass().addAll("bot-message-container");
-        messageContainer.setAlignment(Pos.CENTER_LEFT);
-
-        VBox messageBox = new VBox(5);
-        messageBox.getStyleClass().add("message-bubble");
-
-        Text messageText = new Text(message);
-        messageText.getStyleClass().add("message-text");
-        messageText.setWrappingWidth(500);  
-
-        Text timeText = new Text(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
-        timeText.getStyleClass().add("timestamp");
-
-        messageBox.getChildren().addAll(messageText, timeText);
-        messageContainer.getChildren().add(messageBox);
-        chatHistory.getChildren().add(messageContainer);
-        scrollToBottom();
+        Platform.runLater(() -> {
+            WebView webView = new WebView();
+            webView.getEngine().loadContent(message);
+            webView.setPrefHeight(200);
+            webView.setPrefWidth(400);
+            chatHistory.getChildren().add(webView);
+            scrollToBottom();
+        });
     }
 
     private void setupSuggestedQuestions() {

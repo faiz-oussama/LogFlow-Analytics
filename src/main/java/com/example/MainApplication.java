@@ -52,10 +52,10 @@ public class MainApplication extends Application {
         
         mainContainer.getChildren().add(logVisRoot);
         
-        Scene scene = new Scene(mainContainer, 1280, 680);
+        Scene scene = new Scene(mainContainer, 1280, 670);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         
-        primaryStage.setTitle("Log Management System");
+        primaryStage.setTitle("LogFlow Analytics App");
         primaryStage.setScene(scene);
         
         primaryStage.setOnCloseRequest(event -> {
