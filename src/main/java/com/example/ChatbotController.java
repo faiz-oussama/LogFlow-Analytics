@@ -600,9 +600,8 @@ public class ChatbotController implements Initializable {
 
     private void addBotMessage(String message) {
         Platform.runLater(() -> {
-            // Check if the message contains HTML tags
-            if (message.contains("<html>") || message.contains("<div>") || message.contains("<p>")) {
-                // Use WebView for HTML content
+            boolean isHtmlContent = message.trim().startsWith("Here");
+            if (isHtmlContent) {
                 WebView webView = new WebView();
                 String styledMessage = "<html><head><style>" + USER_STYLES + 
                     "</style></head><body>" + message + "</body></html>";

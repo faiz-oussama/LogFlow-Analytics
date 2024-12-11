@@ -134,7 +134,6 @@ public class WebScrapingService {
             params.put("sort", "relevance");
             params.put("q", query);
             params.put("filter", "!9Z(-wwYGT"); // Custom filter to include question body and answers
-            params.put("tagged", "java");
             params.put("answers", "1");
             params.put("key", API_KEY);
 
