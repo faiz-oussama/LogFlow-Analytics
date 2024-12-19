@@ -1,6 +1,6 @@
 # Real-Time Log Streaming and Analytics Platform
 
-A sophisticated Java-based application that combines the power of the ELK Stack (Elasticsearch, Logstash, Filebeat) with Apache Kafka for comprehensive log management, real-time streaming, visualization, and analysis.
+A sophisticated Java-based application that combines the power of the ELK Stack (Elasticsearch, Logstash, Filebeat) with Apache Kafka for comprehensive log management, real-time streaming, visualization, and analysis. The platform features an AI-powered chatbot interface that enables natural language querying of logs and provides intelligent assistance through Stack Overflow integration.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -20,7 +20,7 @@ A sophisticated Java-based application that combines the power of the ELK Stack 
 
 ## Overview
 
-This project implements an enterprise-grade log management and analytics platform that leverages both the ELK Stack and Apache Kafka to provide a complete solution for log processing, storage, and visualization. The system uses Filebeat to collect logs, Logstash for processing and enrichment, Elasticsearch for storage and search, and Kafka for reliable real-time streaming.
+This project implements an enterprise-grade log management and analytics platform that leverages both the ELK Stack and Apache Kafka to provide a complete solution for log processing, storage, and visualization. The system uses Filebeat to collect logs, Logstash for processing and enrichment, Elasticsearch for storage and search, and Kafka for reliable real-time streaming. The platform is enhanced with an AI-powered chatbot that provides intuitive access to log analysis through natural language queries and integrates with Stack Overflow for technical problem-solving assistance.
 
 ### Key Capabilities
 - Automated log collection using Filebeat
@@ -32,6 +32,8 @@ This project implements an enterprise-grade log management and analytics platfor
 - Customizable analytics dashboard
 - High-performance data processing
 - Reliable log shipping and processing
+- AI-powered chatbot for natural language log analysis
+- Intelligent assistance with Stack Overflow integration
 
 ## Features
 
@@ -60,8 +62,24 @@ This project implements an enterprise-grade log management and analytics platfor
   - Log Visualization
   - Filter Interface
   - Analytics Dashboard
+  - Chatbot Interface
 - Interactive table with sortable columns
 - Custom styling and themes
+
+### 4. AI-Powered Chatbot
+- Interactive chat interface for log analysis
+- Features:
+  - Real-time query responses
+  - Natural language processing for log queries
+  - Suggested questions for common log analysis tasks
+  - Integration with Stack Overflow for technical solutions
+  - Dynamic message history with scroll support
+  - Visual typing indicators for better UX
+- Components:
+  - JavaFX-based chat UI with modern design
+  - WebScrapingService for external knowledge integration
+  - Customizable chat styling via CSS
+  - Asynchronous message processing
 
 ## Technology Stack
 
@@ -79,6 +97,7 @@ This project implements an enterprise-grade log management and analytics platfor
 - JavaFX 17
 - FXML for UI layout
 - CSS for styling
+- Custom chatbot components
 
 ### Development Tools
 - IDE: Any Java IDE (Eclipse, IntelliJ IDEA, VS Code)
